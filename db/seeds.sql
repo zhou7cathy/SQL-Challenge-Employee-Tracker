@@ -15,12 +15,12 @@ VALUES (001,"Sales Lead", 100000, 001),
        (008, "Lawyer", 190000, 004);
 
 INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES (001,"John", "Doe", 001, 001),
-       (002, "Mike", "Chan", 002, null ),
-       (003, "Ashley", "Redriguez", 003, 003),
-       (004, "Kevin", "Tupik", 004, null ),
-       (005, "Kunal", "Singh", 005, 005),
-       (006, "Malia", "Brown", 006, null ),
-       (007, "Sarah", "Lourd", 007, 007),
-       (008, "Tom", "Allen", 008, null );
+VALUES (001,"John", "Doe", 001, null),
+       (002, "Mike", "Chan", 002, 001 ),
+       (003, "Ashley", "Redriguez", 003, null),
+       (004, "Kevin", "Tupik", 004, 003 ),
+       (005, "Kunal", "Singh", 005, null),
+       (006, "Malia", "Brown", 006, 005 ),
+       (007, "Sarah", "Lourd", 007, null),
+       (008, "Tom", "Allen", 008, 007 );
        
