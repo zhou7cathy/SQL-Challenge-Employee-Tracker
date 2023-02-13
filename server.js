@@ -17,7 +17,7 @@ const db = mysql.createConnection(
     // MySQL username,
     user: 'root',
     // TODO: Add MySQL password here
-    password: 'Zhou7247',
+    password: '',
     database: 'company_db'
   },
   console.log(`Connected to the company_db database.`)
@@ -90,6 +90,68 @@ viewAllEmployee = () => {
     console.table(result);
     init();
   });
+}
+
+addDepartment = () => {
+  inquirer.prompt([
+    {
+      type:'input',
+      name:'department',
+      message:'What department do you want to add?',
+    }
+  ])
+    .then(answer => {
+      db.query(`INSERT INTO department (name) VALUES (?)`, answer.department, (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log('Successfully added ' + answer.department + " to departments");
+        init();
+      });
+    });
+}
+
+addRole = () => {
+  inquirer.prompt([
+    {
+      type:'input',
+      name:'title',
+      message:'What job title do you want to add?',
+    },
+    {
+      type:'input',
+      name:'roleId',
+      message:'What is the role id for this title?',
+    },
+    {
+      type:'input',
+      name:'salary',
+      message:'What is the salary for that role?',
+    }
+  ])
+    .then(answer => {
+      db.query(`SELECT id, name FROM department`, (err, results) => {
+        if (err) return console.log(err);
+        const departmentVar = results.map((ele) => { return  {name: ele.name, value: ele.id }});
+
+        inquirer.prompt([
+          {
+            type:'list',
+            name:'department',
+            message:'Which department does this role belongs to?',
+            choices: departmentVar
+          }
+        ]).then(departmentVarAnswer => {
+          db.query(`INSERT INTO role (id, title,salary,department_id) VALUES (?,?,?,?)`, [answer.roleId, answer.title, answer.salary, departmentVarAnswer.department],(err, results) => {
+            if (err) {
+              console.log(err);
+            }
+            console.log('Successfully added ' + answer.title +  ' to roles');
+            init();
+          });
+        });
+      }); 
+    }); 
 }
 
 
