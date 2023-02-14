@@ -100,15 +100,15 @@ addDepartment = () => {
       message:'What department do you want to add?',
     }
   ])
-    .then(answer => {
-      db.query(`INSERT INTO department (name) VALUES (?)`, answer.department, (err, results) => {
-        if (err) {
-          console.log(err);
-        }
-        console.log('Successfully added ' + answer.department + " to departments");
-        init();
-      });
+  .then(answer => {
+    db.query(`INSERT INTO department (name) VALUES (?)`, answer.department, (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log('Successfully added ' + answer.department + " to departments");
+      init();
     });
+  });
 }
 
 addRole = () => {
@@ -124,29 +124,29 @@ addRole = () => {
       message:'What is the salary for that role?',
     }
   ])
-    .then(answer => {
-      db.query(`SELECT id, name FROM department`, (err, results) => {
-        if (err) return console.log(err);
-        const departmentVar = results.map((ele) => { return  {name: ele.name, value: ele.id }});
+  .then(answer => {
+    db.query(`SELECT id, name FROM department`, (err, results) => {
+      if (err) return console.log(err);
+      const departmentVar = results.map((ele) => { return  {name: ele.name, value: ele.id }});
 
-        inquirer.prompt([
-          {
-            type:'list',
-            name:'department',
-            message:'Which department does this role belongs to?',
-            choices: departmentVar
+      inquirer.prompt([
+        {
+          type:'list',
+          name:'department',
+          message:'Which department does this role belongs to?',
+          choices: departmentVar
+        }
+      ]).then(departmentVarAnswer => {
+        db.query(`INSERT INTO role (id, title,salary,department_id) VALUES (?,?,?,?)`, [answer.roleId, answer.title, answer.salary, departmentVarAnswer.department],(err, results) => {
+          if (err) {
+            console.log(err);
           }
-        ]).then(departmentVarAnswer => {
-          db.query(`INSERT INTO role (id, title,salary,department_id) VALUES (?,?,?,?)`, [answer.roleId, answer.title, answer.salary, departmentVarAnswer.department],(err, results) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log('Successfully added ' + answer.title +  ' to roles');
-            init();
-          });
+          console.log('Successfully added ' + answer.title +  ' to roles');
+          init();
         });
-      }); 
+      });
     }); 
+  }); 
 }
 
 addEmployee = () => {
@@ -162,7 +162,63 @@ addEmployee = () => {
       message:`What is the employee's last name?`,
     }
   ])
-    .then(answer => {
+  .then(answer => {
+    db.query(`SELECT id, title FROM role`, (err, results) => {
+      if (err) return console.log(err);
+      const roleVar = results.map((ele) => { return  {name: ele.title, value: ele.id }});
+
+      inquirer.prompt([
+        {
+          type:'list',
+          name:'role',
+          message:`What is employee's role?`,
+          choices: roleVar
+        }
+      ])
+      .then(roleAnswer => {
+        db.query(`SELECT first_name, last_name, id FROM employee`, (err, results) => {
+          if (err) return console.log(err);
+          const managerVar = results.map((ele) => { return  {name: ele.first_name + ''+ ele.last_name, value: ele.id }});
+          const managerOption = {name:'null', value:0};
+          managerVar.push(managerOption);
+
+          inquirer.prompt([
+            {
+              type:'list',
+              name:'manager',
+              message:`Who is employee's manager?`,
+              choices: managerVar
+            }
+          ])
+          .then(ManagerAnswer => {
+            db.query(`INSERT INTO employee (first_name, last_name,role_id, manager_id) VALUES (?,?,?,?)`, [answer.firstName, answer.lastName, roleAnswer.role,ManagerAnswer.manager],(err, results) => {
+              if (err) {
+                console.log(err);
+              }
+              console.log('Successfully added ' + answer.firstName + ' '+ answer.lastName +  ' to employee');
+              init();
+            });
+          });
+        }); 
+      }); 
+    }); 
+  }); 
+}
+
+updateEmployeeRole = () => {
+  db.query(`SELECT id, first_name, last_name FROM employee`, (err, results) => {
+    if (err) return console.log(err);
+    const employeeVar = results.map((ele) => { return  {name: ele.first_name + ' ' + ele.last_name, value: ele.id }});
+
+    inquirer.prompt([
+      {
+        type:'list',
+        name:'updateEmployee',
+        message:`Which employee's role do you want to update?`,
+        choices: employeeVar
+      }
+    ])
+    .then(employeeAnswer => {
       db.query(`SELECT id, title FROM role`, (err, results) => {
         if (err) return console.log(err);
         const roleVar = results.map((ele) => { return  {name: ele.title, value: ele.id }});
@@ -170,42 +226,27 @@ addEmployee = () => {
         inquirer.prompt([
           {
             type:'list',
-            name:'role',
-            message:`What is employee's role?`,
+            name:'updateRole',
+            message:`Which role do you want to assign the selected employee?`,
             choices: roleVar
           }
         ])
-        .then(roleAnswer => {
-          db.query(`SELECT first_name, last_name, id FROM employee`, (err, results) => {
-            if (err) return console.log(err);
-            const managerVar = results.map((ele) => { return  {name: ele.first_name + ''+ ele.last_name, value: ele.id }});
-            const managerOption = {name:'null', value:0};
-            managerVar.push(managerOption);
-
-            inquirer.prompt([
-              {
-                type:'list',
-                name:'manager',
-                message:`Who is employee's manager?`,
-                choices: managerVar
-              }
-            ])
-            .then(ManagerAnswer => {
-              db.query(`INSERT INTO employee (first_name, last_name,role_id, manager_id) VALUES (?,?,?,?)`, [answer.firstName, answer.lastName, roleAnswer.role,ManagerAnswer.manager],(err, results) => {
-                if (err) {
-                  console.log(err);
-                }
-                console.log('Successfully added ' + answer.firstName + ' '+ answer.lastName +  ' to employee');
-                init();
-              });
-            });
-          }); 
-        }); 
-      }); 
-    }); 
+        .then(updateRoleAnswer => {
+          db.query(`UPDATE employee SET role_id = (?) WHERE id = (?)`,[updateRoleAnswer.updateRole, employeeAnswer.updateEmployee], (err, results) => {
+            if (err) {
+              console.log(err);
+            }
+            console.log('Successfully updated role for' + employeeAnswer.updateEmployee);
+            init();
+          });
+        });
+      });
+    });  
+  }); 
 }
 
-
-
+exit= () =>{
+  db.end();
+}
 
 init();
