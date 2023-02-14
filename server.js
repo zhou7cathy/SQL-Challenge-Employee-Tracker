@@ -17,7 +17,7 @@ const db = mysql.createConnection(
     // MySQL username,
     user: 'root',
     // TODO: Add MySQL password here
-    password: '',
+    password: 'password',
     database: 'employee_db'
   },
   console.log(`Connected to the employee_db database.`)
@@ -236,7 +236,7 @@ updateEmployeeRole = () => {
             if (err) {
               console.log(err);
             }
-            console.log('Successfully updated role for' + employeeAnswer.updateEmployee);
+            console.log('Successfully updated role.');
             init();
           });
         });
