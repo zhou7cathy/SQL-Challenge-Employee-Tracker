@@ -18,9 +18,9 @@ const db = mysql.createConnection(
     user: 'root',
     // TODO: Add MySQL password here
     password: '',
-    database: 'company_db'
+    database: 'employee_db'
   },
-  console.log(`Connected to the company_db database.`)
+  console.log(`Connected to the employee_db database.`)
 );
 
 const menuOptions = [
@@ -120,11 +120,6 @@ addRole = () => {
     },
     {
       type:'input',
-      name:'roleId',
-      message:'What is the role id for this title?',
-    },
-    {
-      type:'input',
       name:'salary',
       message:'What is the salary for that role?',
     }
@@ -153,6 +148,64 @@ addRole = () => {
       }); 
     }); 
 }
+
+addEmployee = () => {
+  inquirer.prompt([
+    {
+      type:'input',
+      name:'firstName',
+      message:`What is the employee's first name?`,
+    },
+    {
+      type:'input',
+      name:'lastName',
+      message:`What is the employee's last name?`,
+    }
+  ])
+    .then(answer => {
+      db.query(`SELECT id, title FROM role`, (err, results) => {
+        if (err) return console.log(err);
+        const roleVar = results.map((ele) => { return  {name: ele.title, value: ele.id }});
+
+        inquirer.prompt([
+          {
+            type:'list',
+            name:'role',
+            message:`What is employee's role?`,
+            choices: roleVar
+          }
+        ])
+        .then(roleAnswer => {
+          db.query(`SELECT first_name, last_name, id FROM employee`, (err, results) => {
+            if (err) return console.log(err);
+            const managerVar = results.map((ele) => { return  {name: ele.first_name + ''+ ele.last_name, value: ele.id }});
+            const managerOption = {name:'null', value:0};
+            managerVar.push(managerOption);
+
+            inquirer.prompt([
+              {
+                type:'list',
+                name:'manager',
+                message:`Who is employee's manager?`,
+                choices: managerVar
+              }
+            ])
+            .then(ManagerAnswer => {
+              db.query(`INSERT INTO employee (first_name, last_name,role_id, manager_id) VALUES (?,?,?,?)`, [answer.firstName, answer.lastName, roleAnswer.role,ManagerAnswer.manager],(err, results) => {
+                if (err) {
+                  console.log(err);
+                }
+                console.log('Successfully added ' + answer.firstName + ' '+ answer.lastName +  ' to employee');
+                init();
+              });
+            });
+          }); 
+        }); 
+      }); 
+    }); 
+}
+
+
 
 
 init();
