@@ -4,13 +4,13 @@
 This command-line application is created for business owners who need to view and manage the departments, roles, and employees in their company, so that they can organize and plan their business.
 
 ## Installation
-express.js
-Inquirer version 8.2.4
-mysql2
-console.table
+express.js <br />
+Inquirer version 8.2.4 <br />
+mysql2 <br />
+console.table <br />
 
 ## Usage
-When you invoked the application in terminal/bash by npm start after all the installation you will presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+When you invoked the application in terminal/bash by npm start after all the installation you will presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role.
 
 WHEN you choose to view all departments,
 THEN you will presented with a formatted table showing department names and department ids.
