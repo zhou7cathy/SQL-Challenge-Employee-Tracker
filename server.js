@@ -179,7 +179,7 @@ addEmployee = () => {
         db.query(`SELECT first_name, last_name, id FROM employee`, (err, results) => {
           if (err) return console.log(err);
           const managerVar = results.map((ele) => { return  {name: ele.first_name + ''+ ele.last_name, value: ele.id }});
-          const managerOption = {name:'null', value:0};
+          const managerOption = {name:'null', value:null};
           managerVar.push(managerOption);
 
           inquirer.prompt([
